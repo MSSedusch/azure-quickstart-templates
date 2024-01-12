@@ -41,11 +41,11 @@
     },
     "concourseWorkerDiskSize": {
       "type": "int",
-      "defaultValue": 30,
-      "minValue": 30,
+      "defaultValue": 128,
+      "minValue": 128,
       "maxValue": 1023,
       "metadata": {
-        "description": "Disk size of Concourse worker instance in GB, value must be between 30GB to 1023GB"
+        "description": "Disk size of Concourse worker instance in GB, value must be between 128GB to 1023GB"
       }
     },
     "environment": {
