@@ -8,16 +8,9 @@
         "description": "Name of the jumpbox VM, will be used as DNS Name for the Public IP used to access the Virtual Machine"
       }
     },
-    "jumpboxUbuntuOSVersion": {
-      "type": "string",
-      "defaultValue": "16.04-LTS",
-      "metadata": {
-        "description": "OS version of Ubuntu"
-      }
-    },
     "jumpboxVmSize": {
       "type": "string",
-      "defaultValue": "Standard_D2_v3",
+      "defaultValue": "Standard_D2_v5",
       "metadata": {
         "description": "Please check if the region support this VM size https://azure.microsoft.com/en-us/regions/#services. For more information about virtual machine sizes, see https://azure.microsoft.com/en-us/documentation/articles/virtual-machines-linux-sizes/"
       }
@@ -154,7 +147,8 @@
     "nicName": "[parameters('jumpboxVmName')]",
     "devboxPrivateIPAddress": "10.0.0.100",
     "imagePublisher": "Canonical",
-    "imageOffer": "UbuntuServer",
+    "imageSku": "22_04-lts",
+    "imageOffer": "0001-com-ubuntu-server-jammy",
     "sshKeyPath": "[concat('/home/', parameters('jumpboxUsername'), '/.ssh/authorized_keys')]",
     "baseUriAzureCloud": "[parameters('_artifactsLocation')]",
     "baseUriAzureChinaCloud": "https://cloudfoundry.blob.core.chinacloudapi.cn/bosh-setup/",
@@ -195,7 +189,7 @@
   },
   "resources": [
     {
-      "apiVersion": "2020-07-01",
+      "apiVersion": "2023-04-01",
       "type": "Microsoft.Network/networkSecurityGroups",
       "name": "[variables('boshNetworkSecurityGroup')]",
       "location": "[parameters('location')]",
@@ -261,7 +255,7 @@
       }
     },
     {
-      "apiVersion": "2020-07-01",
+      "apiVersion": "2023-04-01",
       "type": "Microsoft.Network/networkSecurityGroups",
       "name": "[variables('devboxNetworkSecurityGroup')]",
       "location": "[parameters('location')]",
@@ -285,7 +279,7 @@
       }
     },
     {
-      "apiVersion": "2020-07-01",
+      "apiVersion": "2023-04-01",
       "type": "Microsoft.Network/networkSecurityGroups",
       "name": "[variables('concourseNetworkSecurityGroup')]",
       "location": "[parameters('location')]",
@@ -395,14 +389,14 @@
     {
       "type": "Microsoft.Storage/storageAccounts",
       "name": "[variables('defaultStorageAccountName')]",
-      "apiVersion": "2015-06-15",
+      "apiVersion": "2023-01-01",
       "location": "[parameters('location')]",
       "properties": {
         "accountType": "[variables('storageAccountType')]"
       }
     },
     {
-      "apiVersion": "2015-06-15",
+      "apiVersion": "2023-04-01",
       "type": "Microsoft.Network/publicIPAddresses",
       "name": "[concat(parameters('jumpboxVmName'),'-devbox')]",
       "location": "[parameters('location')]",
@@ -414,7 +408,7 @@
       }
     },
     {
-      "apiVersion": "2015-06-15",
+      "apiVersion": "2023-04-01",
       "type": "Microsoft.Network/publicIPAddresses",
       "name": "[concat(parameters('jumpboxVmName'), '-concourse')]",
       "location": "[parameters('location')]",
@@ -423,7 +417,7 @@
       }
     },
     {
-      "apiVersion": "2015-06-15",
+      "apiVersion": "2023-04-01",
       "type": "Microsoft.Network/virtualNetworks",
       "name": "[variables('virtualNetworkName')]",
       "location": "[parameters('location')]",
@@ -450,7 +444,7 @@
       }
     },
     {
-      "apiVersion": "2015-06-15",
+      "apiVersion": "2023-04-01",
       "type": "Microsoft.Network/networkInterfaces",
       "name": "[variables('nicName')]",
       "location": "[parameters('location')]",
@@ -483,7 +477,7 @@
     {
       "name": "generate-customdata",
       "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2015-01-01",
+      "apiVersion": "2022-09-01",
       "dependsOn": [
         "[resourceId('Microsoft.Storage/storageAccounts/', variables('defaultStorageAccountName'))]",
         "[resourceId('Microsoft.Network/networkInterfaces/', variables('nicName'))]"
@@ -532,7 +526,7 @@
       }
     },
     {
-      "apiVersion": "2017-03-30",
+      "apiVersion": "2023-03-01",
       "type": "Microsoft.Compute/virtualMachines",
       "name": "[parameters('jumpboxVmName')]",
       "location": "[parameters('location')]",
@@ -563,7 +557,7 @@
           "imageReference": {
             "publisher": "[variables('imagePublisher')]",
             "offer": "[variables('imageOffer')]",
-            "sku": "[parameters('jumpboxUbuntuOSVersion')]",
+            "sku": "[variables('imageSku')]",
             "version": "latest"
           },
           "osDisk": {
@@ -584,7 +578,7 @@
     {
       "type": "Microsoft.Compute/virtualMachines/extensions",
       "name": "[concat(parameters('jumpboxVmName'),'/initdevbox')]",
-      "apiVersion": "2015-06-15",
+      "apiVersion": "2023-03-01",
       "location": "[parameters('location')]",
       "dependsOn": [
         "[resourceId('Microsoft.Compute/virtualMachines/', parameters('jumpboxVmName'))]"
